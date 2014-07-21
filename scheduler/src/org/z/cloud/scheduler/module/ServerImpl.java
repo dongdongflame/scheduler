@@ -38,7 +38,6 @@ public class ServerImpl implements Server {
 
 	private boolean startDB() {
 		schedulerDB = LevelDB.SCHEDULER;
-		reloadJobFromDB();
 		return true;
 	}
 
