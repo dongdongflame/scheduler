@@ -1,11 +1,14 @@
 package org.z.cloud.scheduler.module;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.z.cloud.commom.module.ModuleFactory;
 import org.z.cloud.common.util.ClassUtil;
+import org.z.cloud.common.util.Common;
 import org.z.cloud.scheduler.Quartz;
 import org.z.cloud.scheduler.Scheduler;
 import org.z.cloud.scheduler.job.CloudJob;
-import org.z.cloud.scheduler.job.CloudJob.JobType;
 
 public class ClientImpl implements Client {
 
@@ -53,9 +56,14 @@ public class ClientImpl implements Client {
 	private boolean handlerJob(CloudJob job) {
 		if (job == null)
 			return false;
-		if (job.getJobType() == JobType.LOCAL)
+		switch (job.getJobType()) {
+		case LOCAL:
 			return handlerLocalJob(job);
-		return handlerRemoteJob(job);
+		case FIXED_IP:
+			return handlerFixIpJob(job);
+		default:
+			return handlerRemoteJob(job);
+		}
 	}
 
 	private boolean handlerLocalJob(CloudJob job) {
@@ -68,6 +76,35 @@ public class ClientImpl implements Client {
 			return scheduler.update(job);
 		}
 		return false;
+	}
+
+	private boolean handlerFixIpJob(CloudJob job) {
+		String[] ips = job.getIps();
+		if (ips == null || ips.length == 0)
+			return false;
+		String[] noLocalIps = excludeLocalIp(ips);
+		if (containLocalIp(ips, noLocalIps))
+			scheduler.add(job);
+		return handlerNoLocalIps(job, noLocalIps);
+	}
+
+	private String[] excludeLocalIp(String[] ips) {
+		List<String> result = new ArrayList<>();
+		for (String ip : ips)
+			if (!ip.equals(Common.localIp))
+				result.add(ip);
+		return (String[]) result.toArray();
+	}
+
+	private boolean containLocalIp(String[] originIps, String[] excludeIps) {
+		return originIps.length > excludeIps.length;
+	}
+
+	private boolean handlerNoLocalIps(CloudJob job, String[] ips) {
+		if (ips.length == 0)
+			return true;
+		job.setIps(ips);
+		return handlerRemoteJob(job);
 	}
 
 	private boolean handlerRemoteJob(CloudJob job) {
