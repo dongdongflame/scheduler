@@ -25,7 +25,10 @@ public class ServerImpl implements Server {
 	public boolean start() {
 		if (!startScheduler())
 			return false;
-		return startDB();
+		if (!startDB())
+			return false;
+		reloadJobFromDB();
+		return true;
 	}
 
 	private boolean startScheduler() {
