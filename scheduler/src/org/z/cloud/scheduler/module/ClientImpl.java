@@ -3,7 +3,7 @@ package org.z.cloud.scheduler.module;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.z.cloud.commom.module.ModuleFactory;
+import org.z.cloud.common.module.ModuleFactory;
 import org.z.cloud.common.util.ClassUtil;
 import org.z.cloud.common.util.Common;
 import org.z.cloud.scheduler.Quartz;
