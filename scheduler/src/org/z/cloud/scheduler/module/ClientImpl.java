@@ -13,9 +13,11 @@ import org.z.cloud.scheduler.job.CloudJob;
 public class ClientImpl implements Client {
 
 	private Scheduler scheduler = null;
+	private long startTime = 0;
 
 	@Override
 	public boolean start() {
+		startTime = System.currentTimeMillis();
 		scheduler = new Quartz();
 		return scheduler.start();
 	}
@@ -110,6 +112,11 @@ public class ClientImpl implements Client {
 	private boolean handlerRemoteJob(CloudJob job) {
 		ModuleFactory.INSTANCES.getModule(ServerImpl.class.getName()).service(ClassUtil.ObjectToBytes(job));
 		return true;
+	}
+
+	@Override
+	public long getStartTime() {
+		return startTime;
 	}
 
 }

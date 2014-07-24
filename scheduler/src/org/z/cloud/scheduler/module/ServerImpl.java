@@ -18,11 +18,13 @@ public class ServerImpl implements Server {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
+	private long startTime = 0L;
 	private Scheduler scheduler = null;
 	private LevelDB schedulerDB = null;
 
 	@Override
 	public boolean start() {
+		startTime = System.currentTimeMillis();
 		if (!startScheduler())
 			return false;
 		if (!startDB())
@@ -142,6 +144,11 @@ public class ServerImpl implements Server {
 	private boolean deleteCloudJobInDB(CloudJob job) {
 		schedulerDB.delete(job.getJobDetail().getKey().toString());
 		return true;
+	}
+
+	@Override
+	public long getStartTime() {
+		return startTime;
 	}
 
 }
