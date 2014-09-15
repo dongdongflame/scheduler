@@ -110,4 +110,10 @@ public class Quartz implements Scheduler {
 		return scheduler;
 	}
 
+	public enum Human {
+
+		FAMILY, LOVE, DERAM;
+
+	}
+
 }
